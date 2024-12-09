@@ -210,6 +210,7 @@ class Menu:
 
 
 if __name__ == '__main__':
+    pygame.mixer.pre_init(44100, -16, 2, 512)
     pygame.init()
 
     pygame.display.set_caption('Snake')
@@ -224,3 +225,60 @@ if __name__ == '__main__':
     settings_menu = SettingsMenu()
     game_active = False
     in_settings = False
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == SCREEN_UPDATE and game_active:
+                main_game.update()
+            if event.type == pygame.KEYDOWN:
+                if game_active:
+                    if event.key in (pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT):
+                        new_direction = Vector2()
+                        if event.key == pygame.K_UP and main_game.snake.direction.y != 1:
+                            new_direction = Vector2(0, -1)
+                        elif event.key == pygame.K_DOWN and main_game.snake.direction.y != -1:
+                            new_direction = Vector2(0, 1)
+                        elif event.key == pygame.K_LEFT and main_game.snake.direction.x != 1:
+                            new_direction = Vector2(-1, 0)
+                        elif event.key == pygame.K_RIGHT and main_game.snake.direction.x != -1:
+                            new_direction = Vector2(1, 0)
+                        if new_direction:
+                            main_game.snake.direction = new_direction
+                elif in_settings:
+                    if event.key == pygame.K_UP:
+                        settings_menu.move_up()
+                    elif event.key == pygame.K_DOWN:
+                        settings_menu.move_down()
+                    if event.key == pygame.K_RETURN:
+                        selection = settings_menu.select()
+                        if selection == 'back':
+                            in_settings = False
+                else:
+                    if event.key == pygame.K_UP:
+                        menu.move_up()
+                    if event.key == pygame.K_DOWN:
+                        menu.move_down()
+                    if event.key == pygame.K_RETURN:
+                        selection = menu.select()
+                        if selection == 'new_game':
+                            game_active = True
+                            main_game = Game()
+                        elif selection == 'settings':
+                            in_settings = True
+                        elif selection == 'exit':
+                            pygame.quit()
+                            exit()
+
+        if game_active:
+            screen.fill(BLACK)
+            main_game.draw_elements()
+        elif in_settings:
+            settings_menu.draw()
+        else:
+            menu.draw()
+
+        pygame.display.update()
+        clock.tick(FPS)
