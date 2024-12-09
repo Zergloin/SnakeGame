@@ -61,6 +61,44 @@ class Fruit:
         self.pos = Vector2(random.randint(0, (WIDTH // CELL_SIZE) - 1), random.randint(0, (HEIGHT // CELL_SIZE) - 1))
 
 
+class Game:
+    def __init__(self):
+        self.snake = Snake()
+        self.fruit = Fruit()
+        self.snake_speed = 150
+
+    def update_speed(self, speed):
+        self.snake_speed = speed
+        pygame.time.set_timer(SCREEN_UPDATE, self.snake_speed)
+
+    def update(self):
+        self.snake.move()
+        self.check_collision()
+        self.check_fail()
+
+    def draw_elements(self):
+        self.fruit.draw()
+        self.snake.draw()
+
+    def check_collision(self):
+        if self.fruit.pos == self.snake.body[0]:
+            self.fruit.randomize()
+            self.snake.add_block()
+            self.snake.play_crunch_sound()
+
+        while self.fruit.pos in self.snake.body:
+            self.fruit.randomize()
+
+    def check_fail(self):
+        head = self.snake.body[0]
+        if not (0 <= head.x < (WIDTH // CELL_SIZE)) or not (
+                0 <= head.y < (HEIGHT // CELL_SIZE)) or head in self.snake.body[1:]:
+            self.game_over()
+
+    def game_over(self):
+        self.snake.reset()
+
+
 if __name__ == '__main__':
     pygame.init()
 
