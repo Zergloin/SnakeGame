@@ -115,6 +115,33 @@ class Game:
         self.display_text(f'High Score: {self.high_score}', WIDTH - 200, 10)
 
 
+class Menu:
+    def __init__(self):
+        self.options = ['Новая игра', 'Настройки', 'Выход']
+        self.selected_option = 0
+        self.font = pygame.font.Font(None, 48)
+
+    def draw(self):
+        screen.fill(BLACK)
+        for index, option in enumerate(self.options):
+            text_surface = self.font.render(option, True, GREEN if index == self.selected_option else WHITE)
+            screen.blit(text_surface, (WIDTH // 2 - text_surface.get_width() // 2, HEIGHT // 2 - 50 + index * 60))
+
+    def move_up(self):
+        self.selected_option = (self.selected_option - 1) % len(self.options)
+
+    def move_down(self):
+        self.selected_option = (self.selected_option + 1) % len(self.options)
+
+    def select(self):
+        if self.selected_option == 0:  # Новая игра
+            return 'new_game'
+        elif self.selected_option == 1:  # Настройки
+            return 'settings'
+        elif self.selected_option == 2:  # Выход
+            return 'exit'
+
+
 if __name__ == '__main__':
     pygame.init()
 
