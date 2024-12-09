@@ -49,6 +49,18 @@ class Snake:
             self.crunch_sound.play()
 
 
+class Fruit:
+    def __init__(self):
+        self.randomize()
+
+    def draw(self):
+        fruit_rect = pygame.Rect(int(self.pos.x * CELL_SIZE), int(self.pos.y * CELL_SIZE), CELL_SIZE, CELL_SIZE)
+        pygame.draw.rect(screen, RED, fruit_rect)
+
+    def randomize(self):
+        self.pos = Vector2(random.randint(0, (WIDTH // CELL_SIZE) - 1), random.randint(0, (HEIGHT // CELL_SIZE) - 1))
+
+
 if __name__ == '__main__':
     pygame.init()
 
