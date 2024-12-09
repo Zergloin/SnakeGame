@@ -65,6 +65,8 @@ class Game:
     def __init__(self):
         self.snake = Snake()
         self.fruit = Fruit()
+        self.score = 0
+        self.high_score = 0
         self.snake_speed = 150
 
     def update_speed(self, speed):
@@ -79,12 +81,14 @@ class Game:
     def draw_elements(self):
         self.fruit.draw()
         self.snake.draw()
+        self.draw_score()
 
     def check_collision(self):
         if self.fruit.pos == self.snake.body[0]:
             self.fruit.randomize()
             self.snake.add_block()
             self.snake.play_crunch_sound()
+            self.score += 1
 
         while self.fruit.pos in self.snake.body:
             self.fruit.randomize()
@@ -96,7 +100,19 @@ class Game:
             self.game_over()
 
     def game_over(self):
+        if self.score > self.high_score:
+            self.high_score = self.score
         self.snake.reset()
+        self.score = 0
+
+    def display_text(self, text, x, y):
+        font = pygame.font.Font(None, 36)
+        text_surface = font.render(text, True, WHITE)
+        screen.blit(text_surface, (x, y))
+
+    def draw_score(self):
+        self.display_text(f'Score: {self.score}', 10, 10)
+        self.display_text(f'High Score: {self.high_score}', WIDTH - 200, 10)
 
 
 if __name__ == '__main__':
