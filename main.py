@@ -115,6 +115,73 @@ class Game:
         self.display_text(f'High Score: {self.high_score}', WIDTH - 200, 10)
 
 
+class SettingsMenu:
+    def __init__(self):
+        self.options = ['Сложность', 'Разрешение', 'Назад']
+        self.difficulty_options = ['Легкий', 'Средний', 'Сложный', 'Назад']
+        self.resolution_options = ['800x600', '1024x768', '1280x720', 'Назад']
+
+        self.selected_option = 0
+        self.selected_difficulty_option = 0
+        self.selected_resolution_option = 0
+
+        self.font = pygame.font.Font(None, 48)
+        self.current_menu = 'main'  # main, difficulty, resolution
+
+    def draw(self):
+        screen.fill(BLACK)
+        options = self.options if self.current_menu == 'main' else self.difficulty_options if self.current_menu == 'difficulty' else self.resolution_options
+        for index, option in enumerate(options):
+            text_surface = self.font.render(option, True, GREEN if index == (
+                self.selected_option if self.current_menu == 'main' else self.selected_difficulty_option if self.current_menu == 'difficulty' else self.selected_resolution_option) else WHITE)
+            screen.blit(text_surface, (WIDTH // 2 - text_surface.get_width() // 2, HEIGHT // 2 - 50 + index * 60))
+
+    def move_up(self):
+        if self.current_menu == 'main':
+            self.selected_option = (self.selected_option - 1) % len(self.options)
+        elif self.current_menu == 'difficulty':
+            self.selected_difficulty_option = (self.selected_difficulty_option - 1) % len(self.difficulty_options)
+        elif self.current_menu == 'resolution':
+            self.selected_resolution_option = (self.selected_resolution_option - 1) % len(self.resolution_options)
+
+    def move_down(self):
+        if self.current_menu == 'main':
+            self.selected_option = (self.selected_option + 1) % len(self.options)
+        elif self.current_menu == 'difficulty':
+            self.selected_difficulty_option = (self.selected_difficulty_option + 1) % len(self.difficulty_options)
+        elif self.current_menu == 'resolution':
+            self.selected_resolution_option = (self.selected_resolution_option + 1) % len(self.resolution_options)
+
+    def select(self):
+        if self.current_menu == 'main':
+            if self.selected_option == 0:  # Сложность
+                self.current_menu = 'difficulty'
+            elif self.selected_option == 1:  # Разрешение
+                self.current_menu = 'resolution'
+            elif self.selected_option == 2:  # Назад
+                return 'back'
+        elif self.current_menu == 'difficulty':
+            selection = self.difficulty_options[self.selected_difficulty_option]
+            if selection == 'Назад':
+                self.current_menu = 'main'
+            else:
+                speed_map = {'Легкий': 150, 'Средний': 100, 'Сложный': 50}
+                main_game.update_speed(speed_map[selection])  # Обновляем скорость игры
+                print(f'Выбрана сложность: {speed_map[selection]}')
+                self.current_menu = 'main'  # Возврат в главное меню после выбора
+        elif self.current_menu == 'resolution':
+            selection = self.resolution_options[self.selected_resolution_option]
+            if selection == 'Назад':
+                self.current_menu = 'main'
+            else:
+                resolution_map = {'800x600': (800, 600), '1024x768': (1024, 768), '1280x720': (1280, 720)}
+                global WIDTH, HEIGHT, screen
+                WIDTH, HEIGHT = resolution_map[selection]
+                screen = pygame.display.set_mode((WIDTH, HEIGHT))
+                print(f'Выбрано разрешение: {WIDTH}x{HEIGHT}')
+                self.current_menu = 'main'  # Возврат в главное меню после выбора
+
+
 class Menu:
     def __init__(self):
         self.options = ['Новая игра', 'Настройки', 'Выход']
@@ -151,3 +218,9 @@ if __name__ == '__main__':
 
     SCREEN_UPDATE = pygame.USEREVENT
     pygame.time.set_timer(SCREEN_UPDATE, 150)
+
+    main_game = Game()
+    menu = Menu()
+    settings_menu = SettingsMenu()
+    game_active = False
+    in_settings = False
